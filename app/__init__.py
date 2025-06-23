@@ -29,7 +29,55 @@ init_datetime(app)  # Handle UTC dates in timestamps
 #-----------------------------------------------------------
 @app.get("/")
 def index():
-    return render_template("pages/home.jinja")
+     with connect_db() as client:
+        # Get all the things from the DB
+        sql = """
+            SELECT teams.code,
+                   teams.name,
+                   teams.description
+
+            FROM teams
+
+            ORDER BY teams.name ASC
+        """
+        result = client.execute(sql)
+        teams = result.rows
+    
+        return render_template("pages/home.jinja", teams=teams)
+     
+
+#-----------------------------------------------------------
+# Thing page route - Show details of a single thing
+#-----------------------------------------------------------
+@app.get("/team/<code>")
+def show_one_thing(code):
+    with connect_db() as client:
+        # Get the thing details from the DB, including the owner info
+        sql = """
+            SELECT teams.code,
+                   teams.name,
+                   teams.description,
+                   teams.website,
+                   teams.manager,
+                   users.name AS owner
+
+            FROM things
+            JOIN users ON teams.manager = users.id
+
+            WHERE teams.code=?
+        """
+        params = [code]
+        result = client.execute(sql, params)
+
+        # Did we get a result?
+        if result.rows:
+            # yes, so show it on the page
+            team = result.rows[0]
+            return render_template("pages/team.jinja", team=team)
+
+        else:
+            # No, so show error
+            return not_found_error()
 
 
 #-----------------------------------------------------------

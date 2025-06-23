@@ -10,32 +10,35 @@
 
 {% block title %}
 
-    Flask Demo
+    Teams
 
 {% endblock %}
 
 
 {% block content %}
 
-    <h1>Flask Demo App with Turso DB and User Accounts</h1>
+    <h1>Teams...</h1>
 
-    <p>This is a simple Flask app that connects to a Turso database to save and retrieve data, and also manage user accounts. This can be used as the basis of your web app.</p>
+    <section id="tech-stack">
+    
+      {% for team in teams %}
 
-    <p>It includes...</p>
+        <article>
+            <header>
+                {{ team.name }}
+            </header>
 
-    <ul>
-        <li>Example routes</li>
-        <li>Example static pages</li>
-        <li>Missing page and server error pages</li>
-        <li>DB connection and error handling</li>
-        <li>Example CRUD actions: Create and Delete</li>
-        <li>User account creation</li>
-        <li>User login / logout</li>
-        <li>Adaption of menus / routes / content based on login status</li>
-        <li>Flash messages for information</li>
-    </ul>
+            <p>{{ team.description }}</p>
 
-    <a href="/things" role="button">Go to the Things...</a>
+            <footer>
+                <p>Find out more about <a href="/team/{{ team.code }}">the {{ team.name }}</a></p>
+            </footer>
+        </article>
+
+      {% endfor %}
+    
+    
+    </section>
 
 {% endblock %}
 
