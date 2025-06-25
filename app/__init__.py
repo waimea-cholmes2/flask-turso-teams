@@ -50,7 +50,7 @@ def index():
 # Thing page route - Show details of a single thing
 #-----------------------------------------------------------
 @app.get("/team/<code>")
-def show_one_thing(code):
+def show_one_team(code):
     with connect_db() as client:
         # Get the thing details from the DB, including the owner info
         sql = """
@@ -59,9 +59,9 @@ def show_one_thing(code):
                    teams.description,
                    teams.website,
                    teams.manager,
-                   users.name AS owner
+                   users.name AS u_name
 
-            FROM things
+            FROM teams
             JOIN users ON teams.manager = users.id
 
             WHERE teams.code=?
@@ -78,6 +78,48 @@ def show_one_thing(code):
         else:
             # No, so show error
             return not_found_error()
+        
+
+#-----------------------------------------------------------
+# Route for adding a user when registration form submitted
+#-----------------------------------------------------------
+@app.post("/add-team")
+def add_team():
+    # Get the data from the form
+    name = request.form.get("name")
+    code = request.form.get("code")
+    description = request.form.get("description")
+    website = request.form.get("website")
+
+    with connect_db() as client:
+        # Attempt to find an existing record for any similar teams
+        sql = "SELECT * FROM teams WHERE code = ?"
+        params = [code]
+        result = client.execute(sql, params)
+
+        # No existing record found, so safe to add the user
+        if not result.rows:
+            # Sanitise the everything
+            name = html.escape(name)
+            code = html.escape(code)
+            description = html.escape(description)
+            website = html.escape(website)
+
+            user_id = session["user_id"]
+            
+
+            # Add the user to the users table
+            sql = "INSERT INTO teams (code, name, description, website, manager) VALUES (?, ?, ?, ?, ?)"
+            params = [code, name, description, website, user_id]
+            client.execute(sql, params)
+
+            # And let them know it was successful and they can login
+            flash("Registration of Team successful", "success")
+            return redirect("/")
+
+        # Found an existing record, so prompt to try again
+        flash(" that code already exists. Try again...", "error")
+        return redirect("/")
 
 
 #-----------------------------------------------------------

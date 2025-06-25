@@ -40,5 +40,53 @@
     
     </section>
 
+    {% if session.user_id %}
+
+    <article>
+
+        <header>
+            <h2>Add a New Team!</h2>
+        </header>
+
+        <form action="/add-team" method="POST">
+
+            <input
+                type="text"
+                name="name"
+                placeholder="Name"
+                required
+            >
+
+            <input
+                type="text"
+                name="code"
+                placeholder="Code"
+                required
+            >
+
+            <input
+                type="text"
+                name="description"
+                placeholder="Description"
+                required
+            >
+
+            <input
+                type="text"
+                name="website"
+                placeholder="Website"
+                required
+            >
+
+            <button>Add Team!</button>
+
+        </form>
+
+        {% else %}
+
+          <a href="/login">Login</a> or <a href="/register">Register</a> to add a new team!
+
+        {% endif %}
+
 {% endblock %}
 

@@ -1,0 +1,51 @@
+{#=====================================================
+  Thing page
+  - Shows details of a single thing
+  - Has a delete link to remove it
+=====================================================#}
+
+{% extends 'pages/base.jinja' %}
+
+
+{% block title %}
+
+    {{ team.name }}
+
+{% endblock %}
+
+
+{% block content %}
+
+    <h1>Team</h1>
+
+
+    <article>
+
+        <header>
+            <h3>{{ team.name }}</h3>
+        </header>
+
+        <p>Description: {{ team.description }}</p>
+
+        <p>website: {{ team.website }}</p>
+
+        <p>manager: {{ team.u_name }}</p>
+
+        <footer>
+
+            {# Only show delete link if logged in AND owner #}
+            {% if session.user_id and (team.manager_id == session.user_id) %}
+
+                <a href="/delete/{{ team.code }}" onclick="return confirm('Really delete?');">Delete</a>
+
+            {% endif %}
+
+        </footer>
+
+    </article>
+
+
+    <a role="button" href="/">Back to team List</a>
+
+{% endblock %}
+
